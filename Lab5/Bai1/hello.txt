@@ -1,0 +1,2 @@
+Xin chào! Đây là nội dung được tải từ máy chủ thông qua AJAX.
+Bạn đã thành công trong việc tạo kết nối AJAX cơ bản!

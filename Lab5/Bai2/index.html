@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 2: GET và POST với AJAX</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #f0f0f0;
+        }
+
+        .method-selector {
+            margin: 20px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Bài 2: Giao tiếp GET và POST</h1>
+
+    <div class="method-selector">
+        <label>
+            <input type="radio" name="method" value="POST" checked> POST
+        </label>
+        <label>
+            <input type="radio" name="method" value="GET"> GET
+        </label>
+    </div>
+
+    <div class="form-group">
+        <label for="name">Họ và tên:</label>
+        <input type="text" id="name" placeholder="Nhập họ tên của bạn" onblur="sendData()">
+    </div>
+
+    <div id="result">Kết quả sẽ hiển thị ở đây...</div>
+
+    <script src="ajax.js"></script>
+</body>
+
+</html>

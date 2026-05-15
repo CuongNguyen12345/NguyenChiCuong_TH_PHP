@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 4: Xử lý dữ liệu XML</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+
+        button {
+            display: block;
+            margin: 20px auto;
+            padding: 12px 30px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0b7dda;
+        }
+
+        #products {
+            margin-top: 30px;
+        }
+
+        .product-item {
+            background-color: #f9f9f9;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-item h3 {
+            margin: 0 0 10px 0;
+            color: #2196F3;
+        }
+
+        .product-item p {
+            margin: 5px 0;
+            color: #666;
+        }
+
+        .price {
+            font-weight: bold;
+            color: #4CAF50;
+            font-size: 18px;
+        }
+
+        .loading {
+            text-align: center;
+            color: #999;
+            font-style: italic;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Bài 4: Danh sách sản phẩm từ XML</h1>
+    <button onclick="loadProducts()">Tải danh sách sản phẩm</button>
+    <div id="products"></div>
+
+    <script>
+        function ajaxRequest() {
+            try {
+                return new XMLHttpRequest();
+            } catch (e) {
+                try {
+                    return new ActiveXObject("Msxml2.XMLHTTP");
+                } catch (e) {
+                    try {
+                        return new ActiveXObject("Microsoft.XMLHTTP");
+                    } catch (e) {
+                        alert("Trình duyệt của bạn không hỗ trợ AJAX!");
+                        return null;
+                    }
+                }
+            }
+        }
+
+        function loadProducts() {
+            var productsDiv = document.getElementById("products");
+            productsDiv.innerHTML = '<p class="loading">Đang tải dữ liệu...</p>';
+
+            var xhr = ajaxRequest();
+
+            if (xhr) {
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState == 4 && xhr.status == 200) {
+                        // Sử dụng responseXML để nhận dữ liệu XML
+                        var xmlDoc = xhr.responseXML;
+
+                        if (xmlDoc) {
+                            displayProducts(xmlDoc);
+                        } else {
+                            productsDiv.innerHTML = '<p style="color: red;">Lỗi: Không thể đọc dữ liệu XML</p>';
+                        }
+                    }
+                };
+
+                xhr.open("GET", "products.php?t=" + Math.random(), true);
+                xhr.send();
+            }
+        }
+
+        function displayProducts(xmlDoc) {
+            var products = xmlDoc.getElementsByTagName("product");
+            var html = '<h2>Danh sách ' + products.length + ' sản phẩm mới nhất:</h2>';
+
+            for (var i = 0; i < products.length; i++) {
+                var id = products[i].getElementsByTagName("id")[0].childNodes[0].nodeValue;
+                var title = products[i].getElementsByTagName("title")[0].childNodes[0].nodeValue;
+                var price = products[i].getElementsByTagName("price")[0].childNodes[0].nodeValue;
+                var description = products[i].getElementsByTagName("description")[0].childNodes[0].nodeValue;
+
+                html += '<div class="product-item">';
+                html += '<h3>' + title + '</h3>';
+                html += '<p>' + description + '</p>';
+                html += '<p class="price">Giá: ' + price + ' VNĐ</p>';
+                html += '<p style="color: #999; font-size: 12px;">Mã SP: ' + id + '</p>';
+                html += '</div>';
+            }
+
+            document.getElementById("products").innerHTML = html;
+        }
+    </script>
+</body>
+
+</html>

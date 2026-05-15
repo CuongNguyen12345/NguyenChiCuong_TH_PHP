@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 6: Tải nội dung động</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+
+        .selector-group {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        label {
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+
+        select {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: 2px solid #4CAF50;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: white;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #45a049;
+        }
+
+        #content {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            min-height: 200px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .loading {
+            text-align: center;
+            color: #999;
+            font-style: italic;
+            padding: 50px;
+        }
+
+        .content-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: white;
+            border-left: 4px solid #4CAF50;
+            border-radius: 5px;
+        }
+
+        .content-item h3 {
+            margin-top: 0;
+            color: #4CAF50;
+        }
+
+        .content-item p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .timestamp {
+            color: #999;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Bài 6: Tải nội dung động theo lựa chọn</h1>
+
+    <div class="selector-group">
+        <label for="category">Chọn danh mục:</label>
+        <select id="category" onchange="loadContent()">
+            <option value="">-- Chọn danh mục --</option>
+            <option value="tintuc">Tin tức</option>
+            <option value="thethao">Thể thao</option>
+            <option value="congnghe">Công nghệ</option>
+        </select>
+    </div>
+
+    <div id="content">
+        <p style="text-align: center; color: #999;">Vui lòng chọn một danh mục để xem nội dung</p>
+    </div>
+
+    <script>
+        function ajaxRequest() {
+            try {
+                return new XMLHttpRequest();
+            } catch (e) {
+                try {
+                    return new ActiveXObject("Msxml2.XMLHTTP");
+                } catch (e) {
+                    try {
+                        return new ActiveXObject("Microsoft.XMLHTTP");
+                    } catch (e) {
+                        alert("Trình duyệt của bạn không hỗ trợ AJAX!");
+                        return null;
+                    }
+                }
+            }
+        }
+
+        function loadContent() {
+            var category = document.getElementById("category").value;
+            var contentDiv = document.getElementById("content");
+
+            if (category === "") {
+                contentDiv.innerHTML = '<p style="text-align: center; color: #999;">Vui lòng chọn một danh mục để xem nội dung</p>';
+                return;
+            }
+
+            // Hiển thị trạng thái đang tải
+            contentDiv.innerHTML = '<p class="loading">⏳ Đang tải dữ liệu...</p>';
+
+            var xhr = ajaxRequest();
+
+            if (xhr) {
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState == 4) {
+                        if (xhr.status == 200) {
+                            contentDiv.innerHTML = xhr.responseText;
+                        } else {
+                            contentDiv.innerHTML = '<p style="color: red; text-align: center;">Lỗi tải dữ liệu!</p>';
+                        }
+                    }
+                };
+
+                // Gửi request với tham số category
+                var url = "content.php?category=" + encodeURIComponent(category) + "&t=" + Math.random();
+                xhr.open("GET", url, true);
+                xhr.send();
+            }
+        }
+    </script>
+</body>
+
+</html>

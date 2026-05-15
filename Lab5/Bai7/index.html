@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 7: Đồng hồ thời gian máy chủ</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        #clock {
+            font-size: 48px;
+            font-weight: bold;
+            color: #667eea;
+            padding: 30px;
+            background-color: #f8f9fa;
+            border-radius: 15px;
+            margin: 20px 0;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
+            font-family: 'Courier New', monospace;
+        }
+
+        #date {
+            font-size: 20px;
+            color: #666;
+            margin-top: 15px;
+        }
+
+        .controls {
+            margin-top: 30px;
+        }
+
+        button {
+            padding: 12px 30px;
+            margin: 0 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        #startBtn {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        #startBtn:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+        }
+
+        #stopBtn {
+            background-color: #f44336;
+            color: white;
+        }
+
+        #stopBtn:hover {
+            background-color: #da190b;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(244, 67, 54, 0.4);
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .status.running {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status.stopped {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>⏰ Đồng hồ thời gian máy chủ</h1>
+        <div id="clock">--:--:--</div>
+        <div id="date">-- / -- / ----</div>
+
+        <div class="controls">
+            <button id="startBtn" onclick="startClock()">Bắt đầu</button>
+            <button id="stopBtn" onclick="stopClock()" disabled>Dừng lại</button>
+        </div>
+
+        <div id="status" class="status stopped">Đồng hồ đang dừng</div>
+    </div>
+
+    <script>
+        var intervalId = null;
+        var isRunning = false;
+
+        function ajaxRequest() {
+            try {
+                return new XMLHttpRequest();
+            } catch (e) {
+                try {
+                    return new ActiveXObject("Msxml2.XMLHTTP");
+                } catch (e) {
+                    try {
+                        return new ActiveXObject("Microsoft.XMLHTTP");
+                    } catch (e) {
+                        alert("Trình duyệt của bạn không hỗ trợ AJAX!");
+                        return null;
+                    }
+                }
+            }
+        }
+
+        function updateTime() {
+            var xhr = ajaxRequest();
+
+            if (xhr) {
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState == 4 && xhr.status == 200) {
+                        try {
+                            var data = JSON.parse(xhr.responseText);
+                            document.getElementById("clock").innerHTML = data.time;
+                            document.getElementById("date").innerHTML = data.date;
+                        } catch (e) {
+                            console.error("Lỗi parse JSON:", e);
+                        }
+                    }
+                };
+
+                xhr.open("GET", "time.php?t=" + Math.random(), true);
+                xhr.send();
+            }
+        }
+
+        function startClock() {
+            if (!isRunning) {
+                // Cập nhật ngay lập tức
+                updateTime();
+
+                // Sau đó cập nhật mỗi 1 giây
+                intervalId = setInterval(updateTime, 1000);
+
+                isRunning = true;
+                document.getElementById("startBtn").disabled = true;
+                document.getElementById("stopBtn").disabled = false;
+
+                var statusDiv = document.getElementById("status");
+                statusDiv.className = "status running";
+                statusDiv.innerHTML = "✓ Đồng hồ đang chạy";
+            }
+        }
+
+        function stopClock() {
+            if (isRunning && intervalId) {
+                clearInterval(intervalId);
+                intervalId = null;
+                isRunning = false;
+
+                document.getElementById("startBtn").disabled = false;
+                document.getElementById("stopBtn").disabled = true;
+
+                var statusDiv = document.getElementById("status");
+                statusDiv.className = "status stopped";
+                statusDiv.innerHTML = "✗ Đồng hồ đã dừng";
+            }
+        }
+
+        // Tự động bắt đầu khi trang load
+        window.onload = function () {
+            startClock();
+        };
+    </script>
+</body>
+
+</html>
